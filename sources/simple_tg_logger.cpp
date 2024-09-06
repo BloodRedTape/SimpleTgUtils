@@ -19,7 +19,7 @@ bool SimpleTgLogger::IsValid() const {
 }
 
 void SimpleTgLogger::Log(const std::string& message) {
-	if (!m_IsEnabled) {
+	if (!m_IsEnabled || !m_LogChat) {
 		return;
 	}
 
