@@ -1,8 +1,8 @@
 cmake_minimum_required (VERSION 3.8)
 
-project ("SimpleTgLogger")
+project ("SimpleTgUtils")
 
-add_library(SimpleTgLogger "./sources/simple_tg_logger.cpp")
-target_link_libraries(SimpleTgLogger PUBLIC TgBot PUBLIC bsl)
-target_include_directories(SimpleTgLogger PUBLIC "./include")
-target_precompile_headers(SimpleTgLogger PUBLIC "./include/simple_tg_logger/simple_tg_logger.hpp")
+add_library(SimpleTgUtils "./sources/tg_logger.cpp" "./sources/tg_backup.cpp")
+target_link_libraries(SimpleTgUtils PUBLIC TgBot PUBLIC bsl PUBLIC miniz)
+target_include_directories(SimpleTgUtils PUBLIC "./include")
+target_precompile_headers(SimpleTgUtils PUBLIC "./include/simple/tg_logger.hpp" PUBLIC "./include/simple/tg_backup.hpp")
