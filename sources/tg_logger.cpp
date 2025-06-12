@@ -1,4 +1,4 @@
-#include "simple_tg_logger/simple_tg_logger.hpp"
+#include "simple/tg_logger.hpp"
 #include "bsl/file.hpp"
 
 SimpleTgLogger::SimpleTgLogger(const std::string &token, std::int64_t log_chat, const std::string &bot_name):
