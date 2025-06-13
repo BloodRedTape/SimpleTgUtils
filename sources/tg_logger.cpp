@@ -25,7 +25,7 @@ void SimpleTgLogger::Log(const std::string& message) {
 	}
 	try{
 		if(m_LogTopicId)
-			m_Bot.getApi().sendMessage(m_LogChat->id, message, false, 0, nullptr, "", false, {}, false, false, m_LogTopicId);
+			m_Bot.getApi().sendMessage(m_LogChat->id, message, nullptr, nullptr, nullptr, "", false, {}, m_LogTopicId);
 		else
 			m_Bot.getApi().sendMessage(m_LogChat->id, Format("[%]: %", m_BotName, message));
 	} catch (const std::exception &exception) {
