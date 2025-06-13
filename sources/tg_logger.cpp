@@ -1,8 +1,9 @@
 #include "simple/tg_logger.hpp"
 #include "bsl/file.hpp"
 
-SimpleTgLogger::SimpleTgLogger(const std::string &token, std::int64_t log_chat, const std::string &bot_name):
+SimpleTgLogger::SimpleTgLogger(const std::string &token, std::int64_t log_chat, const std::string &bot_name, std::int64_t log_topic):
 	m_LogChatId(log_chat),
+	m_LogTopicId(log_topic),
 	m_Bot(token),
 	m_BotName(bot_name),
 	m_IsEnabled(true)
@@ -22,9 +23,11 @@ void SimpleTgLogger::Log(const std::string& message) {
 	if (!m_IsEnabled || !m_LogChat) {
 		return;
 	}
-
 	try{
-		m_Bot.getApi().sendMessage(m_LogChat->id, Format("[%]: %", m_BotName, message));
+		if(m_LogTopicId)
+			m_Bot.getApi().sendMessage(m_LogChat->id, message, false, 0, nullptr, "", false, {}, false, false, m_LogTopicId);
+		else
+			m_Bot.getApi().sendMessage(m_LogChat->id, Format("[%]: %", m_BotName, message));
 	} catch (const std::exception &exception) {
 		Println("Can't log for chat_id % with token %, reason: %", m_LogChatId, m_Bot.getToken(), exception.what());
 	}
