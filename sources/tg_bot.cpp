@@ -215,6 +215,31 @@ TgBot::Message::Ptr SimpleTgBot::ReplyPhoto(TgBot::Message::Ptr source, const st
     return SendPhoto(source->chat->id, source->isTopicMessage ? source->messageThreadId : 0, text, photo, source->messageId);
 }
 
+TgBot::Message::Ptr SimpleTgBot::SendFile(std::int64_t chat, std::int32_t topic, const std::string& text, TgBot::InputFile::Ptr file, std::int64_t reply_message) {
+    try {
+        TgBot::ReplyParameters::Ptr reply_params(new TgBot::ReplyParameters());
+        reply_params->chatId = chat;
+        reply_params->messageId = reply_message;
+	    return getApi().sendDocument(chat, file, file->fileName, text, reply_params, nullptr, ParseMode, false, {}, false, false, topic);
+    }catch (const std::exception& exception) {
+        auto chat_ptr = getApi().getChat(chat);
+        std::string chat_name = chat_ptr->username.size() ? chat_ptr->username : chat_ptr->title;
+
+        Log("Failed to send document in chat '%' id % reason %", chat_name, chat_ptr->id, exception.what());
+    }
+    return nullptr;
+
+}
+
+TgBot::Message::Ptr SimpleTgBot::SendFile(TgBot::Message::Ptr source, const std::string& text, TgBot::InputFile::Ptr file) {
+    return SendPhoto(source->chat->id, source->isTopicMessage ? source->messageThreadId : 0, text, file);
+}
+
+TgBot::Message::Ptr SimpleTgBot::ReplyFile(TgBot::Message::Ptr source, const std::string& text, TgBot::InputFile::Ptr file) {
+    return SendFile(source->chat->id, source->isTopicMessage ? source->messageThreadId : 0, text, file, source->messageId);
+}
+
+
 TgBot::Message::Ptr SimpleTgBot::EditMessage(TgBot::Message::Ptr message, const std::string& text, TgBot::InlineKeyboardMarkup::Ptr reply) {
     try{
         if (text.size() && message->text != text) {

@@ -96,6 +96,12 @@ public:
 
     TgBot::Message::Ptr ReplyPhoto(TgBot::Message::Ptr source, const std::string& text, TgBot::InputFile::Ptr photo);
 
+    TgBot::Message::Ptr SendFile(std::int64_t chat, std::int32_t topic, const std::string& text, TgBot::InputFile::Ptr file, std::int64_t reply_message = 0);
+
+    TgBot::Message::Ptr SendFile(TgBot::Message::Ptr source, const std::string& text, TgBot::InputFile::Ptr photo);
+
+    TgBot::Message::Ptr ReplyFile(TgBot::Message::Ptr source, const std::string& text, TgBot::InputFile::Ptr photo);
+
     TgBot::Message::Ptr EditMessage(TgBot::Message::Ptr message, const std::string& text, TgBot::InlineKeyboardMarkup::Ptr reply);
 
     TgBot::Message::Ptr EditMessage(TgBot::Message::Ptr message, const std::string& text, const KeyboardLayout& keyboard);
