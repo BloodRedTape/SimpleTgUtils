@@ -20,14 +20,38 @@ bool SimpleTgLogger::IsValid() const {
 }
 
 void SimpleTgLogger::Log(const std::string& message) {
-	if (!m_IsEnabled || !m_LogChat) {
+	if (!m_IsEnabled || !m_LogChat || !message.size()) {
 		return;
 	}
+
+	std::string content = m_LogTopicId ? message : Format("[%]: %", m_BotName, message);
+
+	LoggedMessage& last_message = m_LastMessages[m_LogTopicId];
+
+	constexpr auto ResendPeriod = std::chrono::minutes(10);
+	const auto now = std::chrono::steady_clock::now();
+
+	if (last_message.Content == content && now - last_message.Time < ResendPeriod) {
+		last_message.Count++;
+
+		std::string edited_content = Format("%\n\n<b>Repeated % Times</b>", content, last_message.Count);
+
+		auto edited = m_Bot.getApi().editMessageText(edited_content, m_LogChatId, last_message.MessageId, "", "HTML");
+
+		if(edited)
+			return;
+	}
+	
 	try{
-		if(m_LogTopicId)
-			m_Bot.getApi().sendMessage(m_LogChat->id, message, nullptr, nullptr, nullptr, "", false, {}, m_LogTopicId);
-		else
-			m_Bot.getApi().sendMessage(m_LogChat->id, Format("[%]: %", m_BotName, message));
+		auto message = m_LogTopicId ? m_Bot.getApi().sendMessage(m_LogChat->id, content, nullptr, nullptr, nullptr, "", false, {}, m_LogTopicId) : m_Bot.getApi().sendMessage(m_LogChat->id, content);
+			
+		if(message){
+			last_message.Content = content;
+			last_message.Time = now;
+			last_message.MessageId = message->messageId;
+			last_message.Count = 1;
+		}
+
 	} catch (const std::exception &exception) {
 		Println("Can't log for chat_id % with token %, reason: %", m_LogChatId, m_Bot.getToken(), exception.what());
 	}
