@@ -3,6 +3,7 @@
 #include <functional>
 #include <vector>
 #include <unordered_map>
+#include <optional>
 #include <bsl/format.hpp>
 #include <tgbot/Bot.h>
 #include <tgbot/net/TgLongPoll.h>
@@ -141,6 +142,8 @@ public:
 
     template<typename Type>
     void OnMyChatMember(Type *object, void (Type::*handler)(TgBot::ChatMemberUpdated::Ptr));
+
+	std::optional<std::string> DownloadFile(const std::string &file_id)const;
 
     void UpdateCommandDescriptions();
 

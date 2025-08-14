@@ -345,6 +345,20 @@ void SimpleTgBot::OnMyChatMember(ChatMemberStatusHandler chat_member){
     getEvents().onMyChatMember(chat_member);
 }
 
+std::optional<std::string> SimpleTgBot::DownloadFile(const std::string& file_id)const{
+	if(!file_id.size())
+		return std::nullopt;
+		
+	auto file = getApi().getFile(file_id);
+
+    if(!file)
+        return std::nullopt;
+
+	auto content = getApi().downloadFile(file->filePath);
+
+    return content;
+}
+
 void SimpleTgBot::UpdateCommandDescriptions() {
     std::vector<TgBot::BotCommand::Ptr> commands;
     for (const auto& [command, descr] : m_CommandDescriptions) {
