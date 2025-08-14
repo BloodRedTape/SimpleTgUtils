@@ -144,11 +144,11 @@ void SimpleTgBot::SendChatAction(TgBot::Message::Ptr source, const std::string& 
     getApi().sendChatAction(source->chat->id, action, source->isTopicMessage ? source->messageThreadId : 0);
 }
 
-TgBot::Message::Ptr SimpleTgBot::SendMessage(std::int64_t chat, std::int32_t topic, const std::string& message, std::int64_t reply_message) {
-    return SendMessage(chat, topic, message, nullptr, reply_message);
+TgBot::Message::Ptr SimpleTgBot::SendMessage(std::int64_t chat, std::int32_t topic, const std::string& message, std::int64_t reply_message, bool silent) {
+    return SendMessage(chat, topic, message, nullptr, reply_message, silent);
 }
 
-TgBot::Message::Ptr SimpleTgBot::SendMessage(std::int64_t chat, std::int32_t topic, const std::string& message, TgBot::GenericReply::Ptr reply, std::int64_t reply_message) {
+TgBot::Message::Ptr SimpleTgBot::SendMessage(std::int64_t chat, std::int32_t topic, const std::string& message, TgBot::GenericReply::Ptr reply, std::int64_t reply_message, bool silent) {
     if (!message.size()) {
         Log("Can't send empty messages");
         return nullptr;
@@ -164,7 +164,7 @@ TgBot::Message::Ptr SimpleTgBot::SendMessage(std::int64_t chat, std::int32_t top
         reply_params->chatId = chat;
         reply_params->messageId = reply_message;
 
-        result = getApi().sendMessage(chat, message, link_preview, reply_params, reply, ParseMode, false, {}, topic);
+        result = getApi().sendMessage(chat, message, link_preview, reply_params, reply, ParseMode, silent, {}, topic);
     }
     catch (const std::exception& exception) {
         auto chat_ptr = getApi().getChat(chat);
@@ -177,11 +177,11 @@ TgBot::Message::Ptr SimpleTgBot::SendMessage(std::int64_t chat, std::int32_t top
     return result;
 }
 
-TgBot::Message::Ptr SimpleTgBot::SendMessage(TgBot::Message::Ptr source, const std::string& message, bool reply){ 
+TgBot::Message::Ptr SimpleTgBot::SendMessage(TgBot::Message::Ptr source, const std::string& message, bool reply, bool silent){ 
     if(!source)
         return nullptr; 
         
-    return SendMessage(source->chat->id, source->isTopicMessage ? source->messageThreadId : 0, message, reply ? source->messageId : 0); 
+    return SendMessage(source->chat->id, source->isTopicMessage ? source->messageThreadId : 0, message, reply ? source->messageId : 0, silent); 
 }
 
 TgBot::Message::Ptr SimpleTgBot::EditMessage(TgBot::Message::Ptr message, const std::string& text, const KeyboardLayout& keyboard) {

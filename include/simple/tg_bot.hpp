@@ -76,14 +76,14 @@ public:
 
     void SendChatAction(TgBot::Message::Ptr source, const std::string &action);
 
-    TgBot::Message::Ptr SendMessage(std::int64_t chat, std::int32_t topic, const std::string& message, std::int64_t reply_message = 0);
+    TgBot::Message::Ptr SendMessage(std::int64_t chat, std::int32_t topic, const std::string& message, std::int64_t reply_message = 0, bool silent = false);
 
-    TgBot::Message::Ptr SendMessage(TgBot::Message::Ptr source, const std::string& message, bool reply = false);
+    TgBot::Message::Ptr SendMessage(TgBot::Message::Ptr source, const std::string& message, bool reply = false, bool silent = false);
     
-    TgBot::Message::Ptr ReplyMessage(TgBot::Message::Ptr source, const std::string& message){return SendMessage(source, message, true); }
+    TgBot::Message::Ptr ReplyMessage(TgBot::Message::Ptr source, const std::string& message, bool silent = false){return SendMessage(source, message, true, silent); }
 
     //source->isTopicMessage ? source->messageThreadId : 0
-    TgBot::Message::Ptr SendMessage(std::int64_t chat, std::int32_t topic, const std::string& message, TgBot::GenericReply::Ptr reply, std::int64_t reply_message = 0);
+    TgBot::Message::Ptr SendMessage(std::int64_t chat, std::int32_t topic, const std::string& message, TgBot::GenericReply::Ptr reply, std::int64_t reply_message = 0, bool silent = false);
 
     TgBot::Message::Ptr SendKeyboard(std::int64_t chat, std::int32_t topic, const std::string& message, const KeyboardLayout& keyboard, std::int64_t reply_message = 0);
 
