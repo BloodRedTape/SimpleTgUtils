@@ -42,7 +42,7 @@ bool SimpleTgBackup::BackupDirectory(const std::string &directory_path) {
     for (const auto& entry : std::filesystem::recursive_directory_iterator(directory_path)) {
         if (std::filesystem::is_regular_file(entry.path())) {
             std::string rel_path = entry.path().lexically_relative(base_path).string();
-            std::string file_content = ReadEntireFile(entry.path().string());
+            std::string file_content = File::ReadEntire(entry.path());
             files[rel_path] = file_content;
         }
     }
