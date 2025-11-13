@@ -33,7 +33,7 @@ using KeyboardLayout = std::vector<std::vector<KeyboardButton>>;
 namespace Keyboard {
     KeyboardLayout ToKeyboard(const std::vector<std::string> &texts);
 
-    KeyboardLayout ToNiceKeyboard(const std::vector<std::string> &texts, std::size_t row_size, std::function<std::string(std::string)> make_key = [](auto s){return s;});
+    KeyboardLayout ToNiceKeyboard(const std::vector<std::string> &texts, std::size_t row_size,  std::function<std::string(std::string)> make_text = [](auto s){return s;}, std::function<std::string(std::string)> make_key = [](auto s){return s;});
 
     std::vector<KeyboardButton> ToKeyboardRow(const std::vector<std::string> &texts);
 }
