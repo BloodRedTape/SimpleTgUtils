@@ -256,7 +256,7 @@ TgBot::Message::Ptr SimpleTgBot::EditMessage(TgBot::Message::Ptr message, const 
 
         Log("Failed to edit message in chat '%' id % reason %", chat_name, chat_ptr->id, exception.what());
     }
-    return nullptr;
+    return message;
 }
 
 TgBot::Message::Ptr SimpleTgBot::EditMessage(TgBot::Message::Ptr message, const KeyboardLayout& keyboard) {
