@@ -104,8 +104,8 @@ SimpleTgBot::SimpleTgBot(const std::string& token, const TgBot::HttpClient &clie
     }
 }
 
-void SimpleTgBot::LongPoll(){
-	TgBot::TgLongPoll long_poll(*this);
+void SimpleTgBot::LongPoll(std::int32_t limit, std::int32_t timeout){
+	TgBot::TgLongPoll long_poll(*this, limit, timeout);
 
     while(true){
         try{

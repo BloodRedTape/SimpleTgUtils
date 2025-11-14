@@ -58,7 +58,7 @@ private:
 public:
     SimpleTgBot(const std::string &token, const TgBot::HttpClient &client = GetDefaultHttpClient());
 
-    void LongPoll();
+    void LongPoll(std::int32_t limit = 100, std::int32_t timeout = 10);
 
     virtual void OnLongPollIteration();
 
