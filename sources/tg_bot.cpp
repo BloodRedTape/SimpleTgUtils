@@ -104,8 +104,8 @@ SimpleTgBot::SimpleTgBot(const std::string& token, const TgBot::HttpClient &clie
     }
 }
 
-void SimpleTgBot::LongPoll(std::int32_t limit, std::int32_t timeout){
-	TgBot::TgLongPoll long_poll(*this, limit, timeout);
+void SimpleTgBot::LongPoll(std::int32_t limit, std::int32_t timeout, std::vector<std::string> &&allowed_updates){
+	TgBot::TgLongPoll long_poll(*this, limit, timeout, std::make_shared<std::vector<std::string>>(std::move(allowed_updates)));
 
     while(true){
         try{
@@ -241,26 +241,44 @@ TgBot::Message::Ptr SimpleTgBot::ReplyFile(TgBot::Message::Ptr source, const std
 
 
 TgBot::Message::Ptr SimpleTgBot::EditMessage(TgBot::Message::Ptr message, const std::string& text, TgBot::InlineKeyboardMarkup::Ptr reply) {
-    try{
-        if (text.size() && message->text != text) {
-            TgBot::LinkPreviewOptions::Ptr link_preview(new TgBot::LinkPreviewOptions());
-            link_preview->isDisabled = DisableWebpagePreview;
-            return getApi().editMessageText(text, message->chat->id, message->messageId, "", ParseMode, link_preview, reply);
-        } else {
-            return getApi().editMessageReplyMarkup(message->chat->id, message->messageId, "", reply);
-        }
-    }
-    catch (const std::exception& exception) {
-        auto chat_ptr = message->chat;
-        std::string chat_name = chat_ptr->username.size() ? chat_ptr->username : chat_ptr->title;
+    TgBot::Message::Ptr result = message;
 
-        Log("Failed to edit message in chat '%' id % reason %", chat_name, chat_ptr->id, exception.what());
+    if (text.size() && message->text != text) {
+        result = EditMessage(message->chat->id, message->messageId, text, reply);
+    } else {
+        result = EditKeyboard(message->chat->id, message->messageId, reply);
     }
-    return message;
+
+    return result;
+}
+
+TgBot::Message::Ptr SimpleTgBot::EditKeyboard(std::int64_t chat, std::int32_t message, TgBot::InlineKeyboardMarkup::Ptr reply) {
+    try{
+        return getApi().editMessageReplyMarkup(chat, message, "", reply);
+    } catch (const std::exception& exception) {
+        Log("Failed to edit message in chat '%' reason %", chat, exception.what());
+    }
+    return nullptr;
+}
+
+TgBot::Message::Ptr SimpleTgBot::EditKeyboard(std::int64_t chat, std::int32_t message, const KeyboardLayout &keyboard) {
+    return EditKeyboard(chat, message, ToInlineKeyboardMarkup(keyboard));
 }
 
 TgBot::Message::Ptr SimpleTgBot::EditMessage(TgBot::Message::Ptr message, const KeyboardLayout& keyboard) {
     return EditMessage(message, "", ToInlineKeyboardMarkup(keyboard));
+}
+
+TgBot::Message::Ptr SimpleTgBot::EditMessage(std::int64_t chat, std::int32_t message, const std::string& text, TgBot::InlineKeyboardMarkup::Ptr reply) {
+    try{
+        TgBot::LinkPreviewOptions::Ptr link_preview(new TgBot::LinkPreviewOptions());
+        link_preview->isDisabled = DisableWebpagePreview;
+        return getApi().editMessageText(text, chat, message, "", ParseMode, link_preview, reply);
+    }
+    catch (const std::exception& exception) {
+        Log("Failed to edit message in chat '%'  reason %", chat, exception.what());
+    }
+    return nullptr;
 }
 
 TgBot::Message::Ptr SimpleTgBot::EditMessage(TgBot::Message::Ptr message, const std::string& text) {
@@ -344,6 +362,11 @@ void SimpleTgBot::OnCallbackQuery(CallbackQueryHandler handler){
 void SimpleTgBot::OnMyChatMember(ChatMemberStatusHandler chat_member){
     getEvents().onMyChatMember(chat_member);
 }
+
+void SimpleTgBot::OnOtherChatMember(ChatMemberStatusHandler chat_member) {
+    getEvents().onChatMember(chat_member);
+}
+
 
 std::optional<std::string> SimpleTgBot::DownloadFile(const std::string& file_id)const{
 	if(!file_id.size())

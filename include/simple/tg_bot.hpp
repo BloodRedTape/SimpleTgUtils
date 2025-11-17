@@ -58,7 +58,7 @@ private:
 public:
     SimpleTgBot(const std::string &token, const TgBot::HttpClient &client = GetDefaultHttpClient());
 
-    void LongPoll(std::int32_t limit = 100, std::int32_t timeout = 10);
+    void LongPoll(std::int32_t limit = 100, std::int32_t timeout = 10, std::vector<std::string> &&allowed_updates = {});
 
     virtual void OnLongPollIteration();
 
@@ -109,6 +109,12 @@ public:
 
     TgBot::Message::Ptr EditMessage(TgBot::Message::Ptr message, const KeyboardLayout& keyboard);
 
+    TgBot::Message::Ptr EditKeyboard(std::int64_t chat, std::int32_t message, TgBot::InlineKeyboardMarkup::Ptr reply);
+
+    TgBot::Message::Ptr EditKeyboard(std::int64_t chat, std::int32_t message, const KeyboardLayout &keyboard);
+
+    TgBot::Message::Ptr EditMessage(std::int64_t chat, std::int32_t message, const std::string& text, TgBot::InlineKeyboardMarkup::Ptr reply = nullptr);
+
     TgBot::Message::Ptr EditMessage(TgBot::Message::Ptr message, const std::string& text);
 
     void DeleteMessage(TgBot::Message::Ptr message);
@@ -142,6 +148,11 @@ public:
 
     template<typename Type>
     void OnMyChatMember(Type *object, void (Type::*handler)(TgBot::ChatMemberUpdated::Ptr));
+
+    void OnOtherChatMember(ChatMemberStatusHandler chat_member);
+
+    template<typename Type>
+    void OnOtherChatMember(Type *object, void (Type::*handler)(TgBot::ChatMemberUpdated::Ptr));
 
 	std::optional<std::string> DownloadFile(const std::string &file_id)const;
 
@@ -186,6 +197,11 @@ void SimpleTgBot::OnCallbackQuery(Type* object, void (Type::* handler)(TgBot::Ca
 template<typename Type>
 void SimpleTgBot::OnMyChatMember(Type* object, void (Type::* handler)(TgBot::ChatMemberUpdated::Ptr)) {
     OnMyChatMember(std::bind(handler, object, std::placeholders::_1));
+}
+
+template<typename Type>
+void SimpleTgBot::OnOtherChatMember(Type* object, void (Type::* handler)(TgBot::ChatMemberUpdated::Ptr)) {
+    OnOtherChatMember(std::bind(handler, object, std::placeholders::_1));
 }
 
 class SimplePollBot: public SimpleTgBot{
