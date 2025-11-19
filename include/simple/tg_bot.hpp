@@ -26,6 +26,9 @@ struct KeyboardButton {
         CallbackData(text),
         Enabled(enabled)
     {}
+
+    bool operator==(const KeyboardButton &other)const = default;
+    bool operator!=(const KeyboardButton &other)const = default;
 };
 
 using KeyboardLayout = std::vector<std::vector<KeyboardButton>>;
