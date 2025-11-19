@@ -27,8 +27,12 @@ struct KeyboardButton {
         Enabled(enabled)
     {}
 
-    bool operator==(const KeyboardButton &other)const = default;
-    bool operator!=(const KeyboardButton &other)const = default;
+    bool operator==(const KeyboardButton& other)const {
+        return Text == other.Text && CallbackData == other.CallbackData && Enabled == other.Enabled;
+    }
+    bool operator!=(const KeyboardButton& other)const {
+        return !(*this == other);
+    }
 };
 
 using KeyboardLayout = std::vector<std::vector<KeyboardButton>>;
