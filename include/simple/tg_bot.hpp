@@ -41,6 +41,28 @@ namespace Keyboard {
     KeyboardLayout ToKeyboard(const std::vector<std::string> &texts);
 
     KeyboardLayout ToNiceKeyboard(const std::vector<std::string> &texts, std::size_t row_size,  std::function<std::string(std::string)> make_text = [](auto s){return s;}, std::function<std::string(std::string)> make_key = [](auto s){return s;});
+    
+    template<typename T>
+    KeyboardLayout ToNiceKeyboard(const std::vector<T>& entries, std::size_t row_size, std::function<std::string(const T &)> make_text, std::function<std::string(const T &)> make_key){
+        KeyboardLayout layout;
+        std::vector<KeyboardButton> row;
+    
+        std::size_t i = 0;
+        for (const auto& entry: entries) {
+            row.emplace_back(make_text(entry), make_key(entry));
+            i++;
+
+            if (i == row_size) {
+                i = 0;
+                layout.push_back(std::move(row));
+            }
+        }
+    
+        if(row.size())
+            layout.push_back(std::move(row));
+
+        return layout;
+    }
 
     std::vector<KeyboardButton> ToKeyboardRow(const std::vector<std::string> &texts);
 }

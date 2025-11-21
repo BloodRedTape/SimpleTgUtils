@@ -12,26 +12,8 @@ KeyboardLayout Keyboard::ToKeyboard(const std::vector<std::string>& texts) {
     return {ToKeyboardRow(texts)};
 }
 
-KeyboardLayout Keyboard::ToNiceKeyboard(const std::vector<std::string>& texts, std::size_t row_size, std::function<std::string(std::string)> make_text, std::function<std::string(std::string)> make_key)
-{
-    KeyboardLayout layout;
-    std::vector<KeyboardButton> row;
-    
-    std::size_t i = 0;
-    for (const auto& text : texts) {
-        row.emplace_back(make_text(text), make_key(text));
-        i++;
-
-        if (i == row_size) {
-            i = 0;
-            layout.push_back(std::move(row));
-        }
-    }
-    
-    if(row.size())
-        layout.push_back(std::move(row));
-
-    return layout;
+KeyboardLayout Keyboard::ToNiceKeyboard(const std::vector<std::string>& texts, std::size_t row_size, std::function<std::string(std::string)> make_text, std::function<std::string(std::string)> make_key){
+    return ToNiceKeyboard<std::string>(texts, row_size, make_text, make_key);
 }
 
 std::vector<KeyboardButton> Keyboard::ToKeyboardRow(const std::vector<std::string>& texts) {
