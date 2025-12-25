@@ -31,15 +31,19 @@ void SimpleTgLogger::Log(const std::string& message) {
 	constexpr auto ResendPeriod = std::chrono::minutes(10);
 	const auto now = std::chrono::steady_clock::now();
 
-	if (last_message.Content == content && now - last_message.Time < ResendPeriod) {
-		last_message.Count++;
+	try {
+		if (last_message.Content == content && now - last_message.Time < ResendPeriod) {
+			last_message.Count++;
 
-		std::string edited_content = Format("%\n\n<b>Repeated % Times</b>", content, last_message.Count);
+			std::string edited_content = Format("%\n\n<b>Repeated % Times</b>", content, last_message.Count);
 
-		auto edited = m_Bot.getApi().editMessageText(edited_content, m_LogChatId, last_message.MessageId, "", "HTML");
+			auto edited = m_Bot.getApi().editMessageText(edited_content, m_LogChatId, last_message.MessageId, "", "HTML");
 
-		if(edited)
-			return;
+			if(edited)
+				return;
+		}
+	}catch (const std::exception &e) {
+		Println("Can't edit repeated message for chat_id % with token %, reason: %", m_LogChatId, m_Bot.getToken(), exception.what());
 	}
 	
 	try{
