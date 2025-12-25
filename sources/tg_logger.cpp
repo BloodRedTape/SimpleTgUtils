@@ -42,7 +42,7 @@ void SimpleTgLogger::Log(const std::string& message) {
 			if(edited)
 				return;
 		}
-	}catch (const std::exception &e) {
+	}catch (const std::exception &exception) {
 		Println("Can't edit repeated message for chat_id % with token %, reason: %", m_LogChatId, m_Bot.getToken(), exception.what());
 	}
 	
