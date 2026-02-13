@@ -128,8 +128,14 @@ void SimpleTgBot::ClearOldUpdates(){
     }
 }
 
-void SimpleTgBot::SendChatAction(TgBot::Message::Ptr source, const std::string& action) {
-    getApi().sendChatAction(source->chat->id, action, source->isTopicMessage ? source->messageThreadId : 0);
+bool SimpleTgBot::SendChatAction(TgBot::Message::Ptr source, const std::string& action) {
+    try{
+        getApi().sendChatAction(source->chat->id, action, source->isTopicMessage ? source->messageThreadId : 0);
+        return true;
+    } catch (const std::exception& e) {
+        Log("Failed to set chat action: %", e.what());
+    }
+    return false;
 }
 
 TgBot::Message::Ptr SimpleTgBot::SendMessage(std::int64_t chat, std::int32_t topic, const std::string& message, std::int64_t reply_message, bool silent) {
@@ -283,31 +289,34 @@ bool SimpleTgBot::AnswerCallbackQuery(const std::string& callbackQueryId, const 
     return false;
 }
 
-void SimpleTgBot::DeleteMessage(TgBot::Message::Ptr message) {
+bool SimpleTgBot::DeleteMessage(TgBot::Message::Ptr message) {
     if (!message)
-        return;
+        return false;
 
     assert(message->chat);
 
     try{
         getApi().deleteMessage(message->chat->id, message->messageId);
-    }
-    catch (const std::exception& exception) {
+        return true;
+    } catch (const std::exception& exception) {
         auto chat = message->chat;
 
         std::string chat_name = chat->username.size() ? chat->username : chat->title;
 
         Log("Failed to delete message % from chat %, id %, reason: %", message->messageId, chat_name, chat->id, exception.what());
     }
+    return false;
 }
 
-void SimpleTgBot::RemoveKeyboard(TgBot::Message::Ptr message)
+bool SimpleTgBot::RemoveKeyboard(TgBot::Message::Ptr message)
 {
     if(!message)
-        return;
+        return false;
 
     if(message->replyMarkup)
-        EditMessage(message, message->text);
+        return (bool)EditMessage(message, message->text);
+
+    return false;
 }
 
 TgBot::Message::Ptr SimpleTgBot::EnsureMessage(TgBot::Message::Ptr ensurable, std::int64_t chat, std::int32_t topic, const std::string& message, TgBot::InlineKeyboardMarkup::Ptr reply)

@@ -112,7 +112,7 @@ public:
 
     void ClearOldUpdates();
 
-    void SendChatAction(TgBot::Message::Ptr source, const std::string &action);
+    bool SendChatAction(TgBot::Message::Ptr source, const std::string &action);
 
     TgBot::Message::Ptr SendMessage(std::int64_t chat, std::int32_t topic, const std::string& message, std::int64_t reply_message = 0, bool silent = false);
 
@@ -155,9 +155,9 @@ public:
 
     TgBot::Message::Ptr EditMessage(TgBot::Message::Ptr message, const std::string& text);
 
-    void DeleteMessage(TgBot::Message::Ptr message);
+    bool DeleteMessage(TgBot::Message::Ptr message);
 
-    void RemoveKeyboard(TgBot::Message::Ptr message);
+    bool RemoveKeyboard(TgBot::Message::Ptr message);
 
     TgBot::Message::Ptr EnsureMessage(TgBot::Message::Ptr ensurable, std::int64_t chat, std::int32_t topic, const std::string &message, TgBot::InlineKeyboardMarkup::Ptr reply = nullptr);
 
