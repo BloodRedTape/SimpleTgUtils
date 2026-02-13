@@ -42,6 +42,12 @@ static TgBot::InlineKeyboardMarkup::Ptr ToInlineKeyboardMarkup(const KeyboardLay
             TgBot::InlineKeyboardButton::Ptr button_markup(new TgBot::InlineKeyboardButton);
             button_markup->text = button.Text;
             button_markup->callbackData = button.CallbackData;
+            if(button.Style == ButtonStyle::Danger)
+                button_markup->style = "danger";
+            if(button.Style == ButtonStyle::Success)
+                button_markup->style = "success";
+            if(button.Style == ButtonStyle::Primary)
+                button_markup->style = "primary";
 
             row_markup.push_back(button_markup);
         }

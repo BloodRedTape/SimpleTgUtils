@@ -10,15 +10,24 @@
 
 #undef SendMessage
 
+enum class ButtonStyle {
+    Default,
+    Success,
+    Primary,
+    Danger
+};
+
 struct KeyboardButton {
     std::string Text;
     std::string CallbackData;
     bool Enabled = true;
+    ButtonStyle Style;
 
-    KeyboardButton(std::string text, std::string callback_data, bool enabled = true) :
+    KeyboardButton(std::string text, std::string callback_data, bool enabled = true, ButtonStyle style = ButtonStyle::Default) :
         Text(std::move(text)),
         CallbackData(std::move(callback_data)),
-        Enabled(enabled)
+        Enabled(enabled),
+        Style(style)
     {}
 
     KeyboardButton(std::string text, bool enabled = true) :
