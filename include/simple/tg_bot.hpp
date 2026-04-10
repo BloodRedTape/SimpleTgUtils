@@ -100,6 +100,8 @@ public:
 
     virtual void OnLongPollIteration();
 
+    virtual bool IsLegit(std::int64_t chat_id, std::int64_t user_id) const;
+
     void OnLog(LogHandler handler);
 
     template<typename Type>

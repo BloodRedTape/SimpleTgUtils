@@ -109,6 +109,12 @@ void SimpleTgBot::OnLongPollIteration() {
     (void)0;
 }
 
+bool SimpleTgBot::IsLegit(std::int64_t chat_id, std::int64_t user_id) const {
+    (void)chat_id;
+    (void)user_id;
+    return true;
+}
+
 void SimpleTgBot::OnLog(LogHandler handler){
 	m_Log = handler;
 }
@@ -343,25 +349,45 @@ void SimpleTgBot::BroadcastCommand(const std::string& command, TgBot::Message::P
     if(it == m_CommandHandlers.end())
         return;
 
+    if(message->from && !IsLegit(message->chat->id, message->from->id))
+        return;
+
     const auto &handler = it->second;
 
     handler(message);
 }
 
 void SimpleTgBot::OnNonCommandMessage(MessageHandler handler){
-    getEvents().onNonCommandMessage(handler);
+    getEvents().onNonCommandMessage([this, handler](TgBot::Message::Ptr message) {
+        if(message->from && !IsLegit(message->chat->id, message->from->id))
+            return;
+        handler(message);
+    });
 }
 
 void SimpleTgBot::OnCallbackQuery(CallbackQueryHandler handler){
-    getEvents().onCallbackQuery(handler);
+    getEvents().onCallbackQuery([this, handler](TgBot::CallbackQuery::Ptr query) {
+        std::int64_t chat_id = query->message ? query->message->chat->id : 0;
+        if(query->from && !IsLegit(chat_id, query->from->id))
+            return;
+        handler(query);
+    });
 }
 
 void SimpleTgBot::OnMyChatMember(ChatMemberStatusHandler chat_member){
-    getEvents().onMyChatMember(chat_member);
+    getEvents().onMyChatMember([this, chat_member](TgBot::ChatMemberUpdated::Ptr update) {
+        if(update->from && !IsLegit(update->chat->id, update->from->id))
+            return;
+        chat_member(update);
+    });
 }
 
 void SimpleTgBot::OnOtherChatMember(ChatMemberStatusHandler chat_member) {
-    getEvents().onChatMember(chat_member);
+    getEvents().onChatMember([this, chat_member](TgBot::ChatMemberUpdated::Ptr update) {
+        if(update->from && !IsLegit(update->chat->id, update->from->id))
+            return;
+        chat_member(update);
+    });
 }
 
 

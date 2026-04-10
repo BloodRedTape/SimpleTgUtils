@@ -2,6 +2,9 @@
 #include <filesystem>
 #include <miniz.h>
 #include <bsl/file.hpp>
+#include <bsl/log.hpp>
+
+DEFINE_LOG_CATEGORY(SimpleTgBackup)
 
 SimpleTgBackup::SimpleTgBackup(const std::string &token, std::int64_t backup_chat, const std::string &bot_name, const std::string &application_name):
 	m_Bot(token),
@@ -12,7 +15,7 @@ SimpleTgBackup::SimpleTgBackup(const std::string &token, std::int64_t backup_cha
 	try {
 		m_BackupChat = m_Bot.getApi().getChat(m_BackupChatId);
 	} catch (const std::exception &exception) {
-		Println("Can't get chat for chat_id % with token %, reason: %", m_BackupChatId, m_Bot.getToken(), exception.what());
+		LogSimpleTgBackup(Error, "Can't get chat for chat_id % with token %, reason: %", m_BackupChatId, m_Bot.getToken(), exception.what());
 	}
 }
 
@@ -33,6 +36,7 @@ bool SimpleTgBackup::Backup(const std::map<std::string, std::string>& files) {
 
 bool SimpleTgBackup::BackupDirectory(const std::string &directory_path) {
     if (!IsValid()) {
+		LogSimpleTgBackup(Error, "Can't backup directory, IsValid == false");
         return false;
     }
 
@@ -42,8 +46,14 @@ bool SimpleTgBackup::BackupDirectory(const std::string &directory_path) {
     for (const auto& entry : std::filesystem::recursive_directory_iterator(directory_path)) {
         if (std::filesystem::is_regular_file(entry.path())) {
             std::string rel_path = entry.path().lexically_relative(base_path).string();
-            std::string file_content = File::ReadEntire(entry.path()).value_or("");
-            files[rel_path] = file_content;
+
+            std::optional<std::string> file_content = File::ReadEntire(entry.path());
+
+			if (!file_content) {
+				LogSimpleTgBackup(Error, "Can't read file '%'", entry.path());
+				return false;
+			}
+            files[rel_path] = file_content.value_or("");
         }
     }
 	
