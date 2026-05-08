@@ -2,12 +2,27 @@ cmake_minimum_required (VERSION 3.8)
 
 project ("SimpleTgUtils")
 
+find_package(Boost COMPONENTS locale property_tree json)
+find_package(OpenSSL REQUIRED)
+
 add_library(SimpleTgUtils 
 	"./sources/tg_logger.cpp" 
 	"./sources/tg_backup.cpp"
 	"./sources/tg_bot.cpp"
 )
-target_link_libraries(SimpleTgUtils PUBLIC TgBot PUBLIC bsl PUBLIC miniz)
+
+target_link_libraries(SimpleTgUtils 
+	PUBLIC TgBot 
+	PUBLIC OpenSSL::SSL 
+	PUBLIC OpenSSL::Crypto
+	PUBLIC Boost::boost
+	PUBLIC Boost::json
+	PUBLIC Boost::property_tree
+	PUBLIC Boost::asio
+	PUBLIC bsl 
+	PUBLIC miniz
+)
+
 target_include_directories(SimpleTgUtils PUBLIC "./include")
 target_precompile_headers(SimpleTgUtils 
 	PUBLIC "./include/simple/tg_logger.hpp" 
