@@ -2,7 +2,11 @@ cmake_minimum_required (VERSION 3.8)
 
 project ("SimpleTgUtils")
 
-find_package(Boost COMPONENTS locale property_tree json)
+if(VCPKG_TOOLCHAIN)
+    find_package(Boost COMPONENTS locale property_tree json)
+else()
+    find_package(Boost COMPONENTS locale json)
+endif()
 find_package(OpenSSL REQUIRED)
 
 add_library(SimpleTgUtils 
@@ -17,8 +21,8 @@ target_link_libraries(SimpleTgUtils
 	PUBLIC OpenSSL::Crypto
 	PUBLIC Boost::boost
 	PUBLIC Boost::json
-	PUBLIC Boost::property_tree
-	PUBLIC Boost::asio
+	$<$<BOOL:${VCPKG_TOOLCHAIN}>:Boost::property_tree>
+	$<$<BOOL:${VCPKG_TOOLCHAIN}>:Boost::asio>
 	PUBLIC bsl 
 	PUBLIC miniz
 )
